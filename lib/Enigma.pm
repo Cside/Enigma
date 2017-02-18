@@ -1,4 +1,4 @@
-package Metallica;
+package Enigma;
 use common::sense;
 use Amon2::Web;
 use Amon2::Lite;
@@ -99,15 +99,15 @@ __END__
 
 =head1 NAME
 
-Metallica - It's new $module
+Enigma - It's new $module
 
 =head1 SYNOPSIS
 
-    use Metallica;
+    use Enigma;
 
 =head1 DESCRIPTION
 
-Metallica is ...
+Enigma is ...
 
 =head1 LICENSE
 

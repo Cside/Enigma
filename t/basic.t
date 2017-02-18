@@ -1,7 +1,7 @@
 use common::sense;
 use Test::More;
 use Test::Exception;
-use Metallica;
+use Enigma;
 
 no strict 'refs';
 

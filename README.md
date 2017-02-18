@@ -1,14 +1,14 @@
 # NAME
 
-Metallica - It's new $module
+Enigma - It's new $module
 
 # SYNOPSIS
 
-    use Metallica;
+    use Enigma;
 
 # DESCRIPTION
 
-Metallica is ...
+Enigma is ...
 
 # LICENSE
 

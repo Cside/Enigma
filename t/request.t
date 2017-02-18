@@ -9,7 +9,7 @@ use Plack::Util;
 
 #my $app = Plack::Util::load_psgi(path(__FILE__)->parent->child('data/test.psgi'));
 #
-use Metallica;
+use Enigma;
 get '/foo' => sub {
     my $c = shift;
     isa_ok $c, 'Amon2::Web';
