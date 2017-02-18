@@ -32,9 +32,9 @@ Enigma - Amon2::Lite-based framework for API server
 - `del $path, $code;`
 - `head $path, $code;`
 - `options $path, $code;`
-- `$c->render_text($text)`
-- `$c->render_json($hashref_or_arrayref)`
-- `$c->render_json_with_code($status_code, $hashref_or_arrayref)`
+- `$c->render_text($text);`
+- `$c->render_json($hashref_or_arrayref);`
+- `$c->render_json_with_code($status_code, $hashref_or_arrayref);`
 
 # LICENSE
 

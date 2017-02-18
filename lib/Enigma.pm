@@ -147,11 +147,11 @@ Enigma - Amon2::Lite-based framework for API server
 
 =item C<< options $path, $code; >>
 
-=item C<< $c->render_text($text) >>
+=item C<< $c->render_text($text); >>
 
-=item C<< $c->render_json($hashref_or_arrayref) >>
+=item C<< $c->render_json($hashref_or_arrayref); >>
 
-=item C<< $c->render_json_with_code($status_code, $hashref_or_arrayref) >>
+=item C<< $c->render_json_with_code($status_code, $hashref_or_arrayref); >>
 
 =back
 

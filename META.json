@@ -66,6 +66,17 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Cside/Enigma/issues"
+      },
+      "homepage" : "https://github.com/Cside/Enigma",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Cside/Enigma.git",
+         "web" : "https://github.com/Cside/Enigma"
+      }
+   },
    "version" : "0.01",
    "x_contributors" : [
       "Hiroki Honda <cside.story@gmail.com>"
