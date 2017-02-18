@@ -3,13 +3,10 @@ use Test::More;
 use Test::Exception;
 use Plack::Test;
 use HTTP::Request::Common;
-# use Carp::Always;
 use Path::Tiny;
 use Plack::Util;
-
-#my $app = Plack::Util::load_psgi(path(__FILE__)->parent->child('data/test.psgi'));
-#
 use Enigma;
+
 get '/foo' => sub {
     my $c = shift;
     isa_ok $c, 'Amon2::Web';
@@ -34,6 +31,8 @@ subtest 'basic' => sub {
             is $res->content, 'ok';
         };
 };
+
+# TODO JSON を受け付けられるかどうか
 
 # subtest 'validation' => sub {
 #     ok 1;

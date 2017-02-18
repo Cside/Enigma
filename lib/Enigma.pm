@@ -21,9 +21,11 @@ Sub::Install::install_sub({
 });
 
 Sub::Install::install_sub({
+    # TODO Plack::Request に生やしたほうがそれっぽくね？
     into => 'Amon2::Web',
     as   => 'validate',
     code => sub {
+        # TODO $rule は reference じゃなくても良いのでは？
         my ($self, $rule) = @_;
         my $validator = Data::Validator->new(%$rule)->with('NoThrow');;
 
@@ -38,6 +40,7 @@ Sub::Install::install_sub({
             my $errors = $validator->clear_errors;
             push @errors, $_->{message} for @$errors;
         }
+        # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
         my $error_res = $self->render_error_json(400, { errors => \@errors }) if @errors;
 
         return $params, $error_res;
@@ -62,6 +65,7 @@ sub import {
     for my $pair (
         ['put',     'PUT'],
         ['del',     'DELETE'],
+        ['patch',   'PATCH'],
         ['head',    'HEAD'],
         ['options', 'OPTIONS'],
     ) {
@@ -95,19 +99,62 @@ sub import {
 1;
 __END__
 
-=encoding utf-8
+=encoding utf8
+
 
 =head1 NAME
 
-Enigma - It's new $module
+Enigma - Amon2::Lite-based framework for API server
+
 
 =head1 SYNOPSIS
 
     use Enigma;
+    
+    get '/' => sub {
+        my $c = shift;
+        $c->render_json({ message => 'OK' });
+    };
+    
+    post '/' => sub {
+        my $c = shift;
+        $c->validate({
+            foo => 'Str',
+            bar => { isa => 'Int', optional => 1 },
+        });
+        ...
+        $c->render_json_with_code(201, { message => 'created' });
+    };
+    
+    __PACKAGE__->to_app;
 
-=head1 DESCRIPTION
 
-Enigma is ...
+=head1 FUNCTIONS
+
+=over
+
+=item C<< get $path, $code; >>
+
+=item C<< post $path, $code; >>
+
+=item C<< put $path, $code; >>
+
+=item C<< patch $path, $code; >>
+
+=item C<< del $path, $code; >>
+
+=item C<< head $path, $code; >>
+
+=item C<< options $path, $code; >>
+
+=item C<< $c->render_text($text) >>
+
+=item C<< $c->render_json($hashref_or_arrayref) >>
+
+=item C<< $c->render_json_with_code($status_code, $hashref_or_arrayref) >>
+
+=back
+
 
 =head1 LICENSE
 
@@ -116,9 +163,8 @@ Copyright (C) Hiroki Honda.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+
 =head1 AUTHOR
 
-Hiroki Honda E<lt>cside.story@gmail.comE<gt>
-
-=cut
+Hiroki Honda 
 
