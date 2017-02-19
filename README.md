@@ -13,10 +13,10 @@ Enigma - Amon2::Lite-based framework for API server
     
     post '/' => sub {
         my $c = shift;
-        $c->validate({
+        $c->validate(
             foo => 'Str',
             bar => { isa => 'Int', optional => 1 },
-        });
+        );
         ...
         $c->render_json_with_code(201, { message => 'created' });
     };
@@ -32,7 +32,6 @@ Enigma - Amon2::Lite-based framework for API server
 - `del $path, $code;`
 - `head $path, $code;`
 - `options $path, $code;`
-- `$c->render_text($text);`
 - `$c->render_json($hashref_or_arrayref);`
 - `$c->render_json_with_code($status_code, $hashref_or_arrayref);`
 

@@ -26,6 +26,7 @@ subtest 'basic' => sub {
             my $res = $cb->($req);
             is $res->code, 200;
             is $res->content, 'OK';
+            is $res->headers->header('Cache-Control'), 'no-cache';
         };
 };
 

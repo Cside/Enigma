@@ -48,8 +48,13 @@
             "Amon2::Plugin::Web::Text" : "0",
             "Amon2::Trigger" : "0",
             "Amon2::Web" : "0",
+            "App::scan_prereqs_cpanfile" : "0",
             "Data::Validator" : "0",
             "JSON" : "0",
+            "Minilla::Project" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::DebugRequestParams" : "0",
+            "Plack::Util" : "0",
             "Sub::Install" : "0",
             "common::sense" : "0"
          }
@@ -57,9 +62,7 @@
       "test" : {
          "requires" : {
             "HTTP::Request::Common" : "0",
-            "Path::Tiny" : "0",
             "Plack::Test" : "0",
-            "Plack::Util" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
@@ -78,6 +81,7 @@
       }
    },
    "version" : "0.01",
+   "x_authority" : "cpan:CSIDE",
    "x_contributors" : [
       "Hiroki Honda <cside.story@gmail.com>"
    ],

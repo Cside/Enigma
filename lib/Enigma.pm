@@ -3,13 +3,18 @@ use common::sense;
 use Amon2::Web;
 use Amon2::Lite;
 use Amon2::Trigger;
+use Amon2::Plugin::Web::JSON;
+use Amon2::Plugin::Web::Text;
 use Sub::Install;
 use JSON;
 use Data::Validator;
+use Plack::Builder;
+use Plack::Util;
+use Plack::Middleware::DebugRequestParams;
 
 our $VERSION = "0.01";
 
-# TODO no-cache
+no warnings 'redefine';
 
 Sub::Install::install_sub({
     into => 'Amon2::Web',
@@ -54,7 +59,6 @@ Sub::Install::install_sub({
 sub import {
     my ($class) = @_;
     no strict 'refs';
-    no warnings 'redefine';
 
     my $caller = caller(0);
 
@@ -88,15 +92,47 @@ sub import {
 
     for my $method (qw(
         get post
-        add_trigger router to_app
+        add_trigger router
     )) {
-        no warnings 'redefine';
         Sub::Install::install_sub({
             into => $caller,
             as   => $method,
             code => \&{__PACKAGE__ . "::$method"},
         });
     }
+
+    Sub::Install::install_sub({
+        into => $caller,
+        as   => 'to_app',
+        code => sub {
+            my ($class, %opts) = @_;
+
+            my $app = &{__PACKAGE__ . "::to_app"}($class, %opts);
+
+            return builder {
+                enable sub {
+                    my $app = shift;
+                    sub {
+                        my $res = $app->($_[0]);
+
+                        my $header = Plack::Util::headers($res->[1]);
+
+                        # TODO ガバガバだけどあとで直す
+                        $header->set('Access-Control-Allow-Origin' => '*');
+                        $header->set('Access-Control-Allow-Methods' => join(', ', qw( POST GET PUT DELETE HEAD OPTIONS )));
+                        $header->set('Access-Control-Allow-Headers' => join(', ', qw( Content-Type X-Requested-With )));
+
+                        $header->set('Pragma'        => 'no-cache');
+                        $header->set('Cache-Control' => 'no-cache');
+
+                        return $res;
+                    };
+                };
+                enable "DebugRequestParams";
+                return $app;
+            };
+        },
+    });
 }
 
 

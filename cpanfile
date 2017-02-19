@@ -1,10 +1,14 @@
 requires 'Amon2::Lite';
+requires 'Amon2::Plugin::Web::JSON';
+requires 'Amon2::Plugin::Web::Text';
 requires 'Amon2::Trigger';
 requires 'Amon2::Web';
-requires 'Amon2::Plugin::Web::Text';
-requires 'Amon2::Plugin::Web::JSON';
 requires 'Data::Validator';
 requires 'JSON';
+requires 'Minilla::Project';
+requires 'Plack::Builder';
+requires 'Plack::Middleware::DebugRequestParams';
+requires 'Plack::Util';
 requires 'Sub::Install';
 requires 'common::sense';
 
@@ -15,9 +19,9 @@ on configure => sub {
 
 on test => sub {
     requires 'HTTP::Request::Common';
-    requires 'Path::Tiny';
     requires 'Plack::Test';
-    requires 'Plack::Util';
     requires 'Test::Exception';
     requires 'Test::More', '0.98';
 };
+
+requires 'App::scan_prereqs_cpanfile';

@@ -1,4 +1,4 @@
 name = "Enigma"
 # badges = ["travis"]
 module_maker="ModuleBuildTiny"
-
+authority = "cpan:CSIDE"
