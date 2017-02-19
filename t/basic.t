@@ -3,9 +3,9 @@ use Test::More;
 use Test::Exception;
 use Enigma;
 
-no strict 'refs';
-
 for my $method (qw(get post put head del options)) {
+    no strict 'refs';
+
     can_ok __PACKAGE__, $method;
     lives_ok {
         my $code = \&{__PACKAGE__ . "::$method"};

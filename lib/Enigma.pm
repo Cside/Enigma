@@ -27,6 +27,7 @@ Sub::Install::install_sub({
     code => sub {
         # TODO $rule は reference じゃなくても良いのでは？
         my ($self, $rule) = @_;
+        # TODO 毎度 New するの無駄じゃない？
         my $validator = Data::Validator->new(%$rule)->with('NoThrow');;
 
         my $params = eval { decode_json $self->req->content };
@@ -43,6 +44,7 @@ Sub::Install::install_sub({
         # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
         my $error_res = $self->render_error_json(400, { errors => \@errors }) if @errors;
 
+        # TODO __PACKAGE__->error_res とかでアクセスできたら楽そう
         return $params, $error_res;
     },
 });
@@ -146,8 +148,6 @@ Enigma - Amon2::Lite-based framework for API server
 =item C<< head $path, $code; >>
 
 =item C<< options $path, $code; >>
-
-=item C<< $c->render_text($text); >>
 
 =item C<< $c->render_json($hashref_or_arrayref); >>
 
