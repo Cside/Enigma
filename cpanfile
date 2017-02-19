@@ -5,6 +5,7 @@ requires 'Amon2::Trigger';
 requires 'Amon2::Web';
 requires 'Data::Clone';
 requires 'Data::Validator';
+requires 'HTTP::Status';
 requires 'JSON';
 requires 'Minilla::Project';
 requires 'Plack::Builder';

@@ -51,6 +51,7 @@
             "App::scan_prereqs_cpanfile" : "0",
             "Data::Clone" : "0",
             "Data::Validator" : "0",
+            "HTTP::Status" : "0",
             "JSON" : "0",
             "Minilla::Project" : "0",
             "Plack::Builder" : "0",

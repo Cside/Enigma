@@ -12,6 +12,7 @@ use Data::Validator;
 use Plack::Builder;
 use Plack::Util;
 use Plack::Middleware::DebugRequestParams;
+use HTTP::Status qw(:constants :is status_message);
 
 our $VERSION = "0.01";
 
@@ -22,6 +23,19 @@ Sub::Install::install_sub({
     as   => 'render_json_with_code',
     code => sub {
         my ($c, $code, $data) = @_;
+        unless ($data) {
+            if (is_success($code)) {
+                $data = {
+                    message => status_message($code),
+                };
+            } else {
+                $data = {
+                    errors => [
+                        { message => status_message($code) }
+                    ]
+                };
+            }
+        }
         my $res = $c->render_json($data);
         $res->status($code);
         return $res;
