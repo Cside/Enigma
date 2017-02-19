@@ -11,7 +11,7 @@ Enigma - Amon2::Lite-based framework for API server
         $c->render_json({ message => 'OK' });
     };
     
-    post '/' => sub {
+    put '/' => sub {
         my ($c) = @_;
         $c->validate(
             foo => 'Str',

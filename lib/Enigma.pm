@@ -17,8 +17,6 @@ our $VERSION = "0.01";
 
 no warnings 'redefine';
 
-# TODO エラーフォーマットに統一性がない
-
 Sub::Install::install_sub({
     into => 'Amon2::Web',
     as   => 'render_json_with_code',
@@ -97,15 +95,13 @@ Sub::Install::install_sub({
             push @errors, $_->{message} for @$errors;
         }
         if (@errors) {
-            # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
+            # XXX 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
             $c->error_res(
                 $c->_error_res(400, \@errors),
             );
             return;
         }
 
-        # TODO __PACKAGE__->error_res とかでアクセスできたら楽そう
-        # return $params, $error_res;
         return $params;
     },
 });
@@ -229,7 +225,7 @@ Enigma - Amon2::Lite-based framework for API server
         $c->render_json({ message => 'OK' });
     };
     
-    post '/' => sub {
+    put '/' => sub {
         my ($c) = @_;
         $c->validate(
             foo => 'Str',
