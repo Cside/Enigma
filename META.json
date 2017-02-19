@@ -49,6 +49,7 @@
             "Amon2::Trigger" : "0",
             "Amon2::Web" : "0",
             "App::scan_prereqs_cpanfile" : "0",
+            "Data::Clone" : "0",
             "Data::Validator" : "0",
             "JSON" : "0",
             "Minilla::Project" : "0",

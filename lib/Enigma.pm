@@ -6,6 +6,7 @@ use Amon2::Trigger;
 use Amon2::Plugin::Web::JSON;
 use Amon2::Plugin::Web::Text;
 use Sub::Install;
+use Data::Clone qw(clone);
 use JSON;
 use Data::Validator;
 use Plack::Builder;
@@ -15,6 +16,8 @@ use Plack::Middleware::DebugRequestParams;
 our $VERSION = "0.01";
 
 no warnings 'redefine';
+
+# TODO エラーフォーマットに統一性がない
 
 Sub::Install::install_sub({
     into => 'Amon2::Web',
@@ -28,18 +31,50 @@ Sub::Install::install_sub({
 });
 
 Sub::Install::install_sub({
-    # TODO Plack::Request に生やしたほうがそれっぽくね？
+    into => 'Amon2::Web',
+    as   => 'error_res',
+    code => sub {
+        my ($c, $res) = @_;
+        $c->{error_res} = $res if $res;
+        return $c->{error_res};
+    },
+});
+
+my %VALIDATORS;
+Sub::Install::install_sub({
     into => 'Amon2::Web',
     as   => 'validate',
     code => sub {
-        my ($self, %rule) = @_;
-        # TODO 毎度 New するの無駄じゃない？
-        my $validator = Data::Validator->new(%rule)->with('NoThrow');;
+        my ($c, %rule) = @_;
+        my ($package, undef, $line) = caller(0);
+        # XXX 果たしてこれで呼び出し元が unique に特定できるのかは疑問が残る
+        my $key = sprintf '%s:%d', $package, $line;
+        my $validator = $VALIDATORS{$key} ||= Data::Validator->new(%rule)->with('NoThrow');;
+        my $p = clone($c->{p});
 
-        # TODO Content-Type ごとに
-        my $params = eval { decode_json $self->req->content };
-        return (undef, $self->render_error_json(400, { errors => ['Malformed JSON'] }))
-          if $@;
+        my $params = do {
+            my $json_params = ( ($c->req->header('content-type') || "") =~ m|application/json|)
+                              ? eval { decode_json( $c->req->content); } || {}
+                              : {};
+            my $params = $c->req->parameters;
+            my $path_parameter = do {
+                delete $p->{method};
+                delete $p->{code};
+                $p;
+            };
+
+            +{
+                %$json_params,
+                %$params,
+                %$path_parameter,
+            };
+        };
+        if ($@) {
+            $c->error_res(
+                $c->render_json_with_code(400, { errors => ['Malformed JSON'] }),
+            );
+            return;
+        }
 
         $validator->validate(%$params);
 
@@ -48,11 +83,17 @@ Sub::Install::install_sub({
             my $errors = $validator->clear_errors;
             push @errors, $_->{message} for @$errors;
         }
-        # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
-        my $error_res = $self->render_error_json(400, { errors => \@errors }) if @errors;
+        if (@errors) {
+            # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
+            $c->error_res(
+                $c->render_json_with_code(400, { errors => \@errors }),
+            );
+            return;
+        }
 
         # TODO __PACKAGE__->error_res とかでアクセスできたら楽そう
-        return $params, $error_res;
+        # return $params, $error_res;
+        return $params;
     },
 });
 
@@ -68,7 +109,6 @@ sub import {
 
     $caller->load_plugins(qw/Web::JSON/);
     $caller->load_plugins(qw/Web::Text/);
-
 
     for my $pair (
         ['put',     'PUT'],
@@ -91,7 +131,7 @@ sub import {
     }
 
     for my $method (qw(
-        get post
+        get post any
         add_trigger router
     )) {
         Sub::Install::install_sub({
@@ -100,6 +140,27 @@ sub import {
             code => \&{__PACKAGE__ . "::$method"},
         });
     }
+
+
+    Sub::Install::install_sub({
+        into => $base_class,
+        as   => 'to_app',
+        code => sub {
+        },
+    });
+    *{"${base_class}\::dispatch"} = sub {
+        my ($c) = @_;
+        if (my $p = router->match($c->req->env)) {
+            $c->{p} = $p;
+            return $p->{code}->($c);
+        } else {
+            if (router->method_not_allowed) {
+                return $c->render_json_with_code(405, { message => 'Method Not Allowed'});
+            }
+            return $c->render_json_with_code(404, { message => 'Not Found'});
+        }
+    };
+
 
     Sub::Install::install_sub({
         into => $caller,
@@ -128,6 +189,7 @@ sub import {
                         return $res;
                     };
                 };
+                # TODO application/json に対応
                 enable "DebugRequestParams";
                 return $app;
             };
@@ -152,16 +214,16 @@ Enigma - Amon2::Lite-based framework for API server
     use Enigma;
     
     get '/' => sub {
-        my $c = shift;
+        my ($c) = @_;
         $c->render_json({ message => 'OK' });
     };
     
     post '/' => sub {
-        my $c = shift;
+        my ($c) = @_;
         $c->validate(
             foo => 'Str',
             bar => { isa => 'Int', optional => 1 },
-        );
+        ) or return $c->error_res;
         ...
         $c->render_json_with_code(201, { message => 'created' });
     };

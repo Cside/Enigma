@@ -3,7 +3,7 @@ use Test::More;
 use Test::Exception;
 use Enigma;
 
-for my $method (qw(get post put head del options)) {
+for my $method (qw(get post put head del options any)) {
     no strict 'refs';
 
     can_ok __PACKAGE__, $method;

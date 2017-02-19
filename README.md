@@ -7,16 +7,16 @@ Enigma - Amon2::Lite-based framework for API server
     use Enigma;
     
     get '/' => sub {
-        my $c = shift;
+        my ($c) = @_;
         $c->render_json({ message => 'OK' });
     };
     
     post '/' => sub {
-        my $c = shift;
+        my ($c) = @_;
         $c->validate(
             foo => 'Str',
             bar => { isa => 'Int', optional => 1 },
-        );
+        ) or return $c->error_res;
         ...
         $c->render_json_with_code(201, { message => 'created' });
     };

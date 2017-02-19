@@ -3,6 +3,7 @@ requires 'Amon2::Plugin::Web::JSON';
 requires 'Amon2::Plugin::Web::Text';
 requires 'Amon2::Trigger';
 requires 'Amon2::Web';
+requires 'Data::Clone';
 requires 'Data::Validator';
 requires 'JSON';
 requires 'Minilla::Project';
