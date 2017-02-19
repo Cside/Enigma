@@ -23,10 +23,22 @@ Sub::Install::install_sub({
     into => 'Amon2::Web',
     as   => 'render_json_with_code',
     code => sub {
-        my ($self, $code, $data) = @_;
-        my $res = $self->render_json($data);
+        my ($c, $code, $data) = @_;
+        my $res = $c->render_json($data);
         $res->status($code);
         return $res;
+    },
+});
+
+Sub::Install::install_sub({
+    into => 'Amon2::Web',
+    as   => '_error_res',
+    code => sub {
+        my ($c, $code, $messages) = @_;
+        return $c->render_json_with_code($code, [
+            map { +{ message => $_ } }
+            @$messages
+        ]);
     },
 });
 
@@ -60,6 +72,7 @@ Sub::Install::install_sub({
             my $path_parameter = do {
                 delete $p->{method};
                 delete $p->{code};
+                $ENV{_DEBUG_REQUEST_PARAMS} = encode_json($p) if %$p;
                 $p;
             };
 
@@ -71,7 +84,7 @@ Sub::Install::install_sub({
         };
         if ($@) {
             $c->error_res(
-                $c->render_json_with_code(400, { errors => ['Malformed JSON'] }),
+                $c->_error_res(400, ['Malformed JSON']),
             );
             return;
         }
@@ -86,7 +99,7 @@ Sub::Install::install_sub({
         if (@errors) {
             # TODO 生のエラーそのまま返すのはどうなの...。開発時は便利だけど。
             $c->error_res(
-                $c->render_json_with_code(400, { errors => \@errors }),
+                $c->_error_res(400, \@errors),
             );
             return;
         }
@@ -141,7 +154,6 @@ sub import {
         });
     }
 
-
     Sub::Install::install_sub({
         into => $base_class,
         as   => 'to_app',
@@ -189,14 +201,13 @@ sub import {
                         return $res;
                     };
                 };
-                # TODO application/json に対応
-                enable "DebugRequestParams";
+                enable "DebugRequestParams"
+                    if ($ENV{PLACK_ENV} || '') eq '' || $ENV{PLACK_ENV} eq 'development';
                 return $app;
             };
         },
     });
 }
-
 
 1;
 __END__
