@@ -9,6 +9,8 @@ use Data::Validator;
 
 our $VERSION = "0.01";
 
+# TODO no-cache
+
 Sub::Install::install_sub({
     into => 'Amon2::Web',
     as   => 'render_json_with_code',
@@ -25,11 +27,11 @@ Sub::Install::install_sub({
     into => 'Amon2::Web',
     as   => 'validate',
     code => sub {
-        # TODO $rule は reference じゃなくても良いのでは？
-        my ($self, $rule) = @_;
+        my ($self, %rule) = @_;
         # TODO 毎度 New するの無駄じゃない？
-        my $validator = Data::Validator->new(%$rule)->with('NoThrow');;
+        my $validator = Data::Validator->new(%rule)->with('NoThrow');;
 
+        # TODO Content-Type ごとに
         my $params = eval { decode_json $self->req->content };
         return (undef, $self->render_error_json(400, { errors => ['Malformed JSON'] }))
           if $@;
@@ -120,10 +122,10 @@ Enigma - Amon2::Lite-based framework for API server
     
     post '/' => sub {
         my $c = shift;
-        $c->validate({
+        $c->validate(
             foo => 'Str',
             bar => { isa => 'Int', optional => 1 },
-        });
+        );
         ...
         $c->render_json_with_code(201, { message => 'created' });
     };
